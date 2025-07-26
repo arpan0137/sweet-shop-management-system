@@ -12,4 +12,18 @@ describe("POST /api/auth/register", () => {
         });
         expect(response.statusCode).toEqual(201);
     });
+
+    it('should save the user to the database',async () => {
+        const userData = {
+            username: "testuser2",
+            password: "test1234"
+        }
+
+        await supertest(app)
+        .post('/api/auth/register')
+        .send(userData)
+
+        const savedUser = await User.findOne({username: "testuser2"});
+        expect(savedUser).not.toBeNull();
+    })
 });
