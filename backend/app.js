@@ -1,6 +1,7 @@
 // In backend/app.js
 import express from "express";
 const app = express();
+import authRoutes from "./src/routes/auth.routes";
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -10,9 +11,7 @@ app.get('/', (req, res) => {
     res.send('Backend server is running!');
 });
 
-// route for user registration
-app.post('/api/auth/register',(req,res) => {
-    res.status(201).json({message: "User registerd successfully"});
-});
+// Use auth routes for any requests to /api/auth
+app.use("/api/auth",authRoutes);
 
 export default app
