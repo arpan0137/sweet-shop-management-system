@@ -203,7 +203,7 @@ describe('POST /api/sweets/:id/restock', () => {
     let sweetToRestock;
 
     beforeEach(async () => {
-        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, process.env.JWT_SECRET);
+        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, env.jwtSecret);
         sweetToRestock = await Sweet.create(
             { name: 'Mohanthal', category: 'Burfi', price: 400, quantityinstock: 5 }
         );
@@ -220,7 +220,7 @@ describe('POST /api/sweets/:id/restock', () => {
     });
 
     it('should block a non-admin from restocking a sweet', async () => {
-        const userToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, process.env.JWT_SECRET);
+        const userToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, env.jwtSecret);
         const res = await request(app)
             .post(`/api/sweets/${sweetToRestock._id}/restock`)
             .set('Authorization', `Bearer ${userToken}`)
