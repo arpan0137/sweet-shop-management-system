@@ -1,7 +1,14 @@
 import { useEffect } from "react";
 import "./App.css";
+import {
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Navigate,
+} from "react-router-dom";
 import AOS from "aos";
 import LoginPage from "./pages/LoginPage";
+import RegistrationPage from "./pages/RegistrationPage";
 
 function App() {
 	useEffect(() => {
@@ -11,7 +18,22 @@ function App() {
 		});
 	}, []);
 
-	return <LoginPage />;
+	return (
+		<Router>
+			<Routes>
+				{/* The default route redirects to the login page */}
+				<Route path="/" element={<Navigate to="/login" />} />
+
+				{/* Route for the login page */}
+				<Route path="/login" element={<LoginPage />} />
+
+				{/* Route for the registration page */}
+				<Route path="/register" element={<RegistrationPage />} />
+
+				{/* Later, we will add protected routes for the dashboard here */}
+			</Routes>
+		</Router>
+	);
 }
 
 export default App;

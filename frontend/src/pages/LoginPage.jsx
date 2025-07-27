@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Import Link and useNavigate
 import "aos/dist/aos.css";
 import AOS from "aos";
 
@@ -10,6 +11,8 @@ const LoginPage = () => {
 	// State for handling API call status
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+
+	const navigate = useNavigate(); // Hook for navigation
 
 	// Initialize AOS animations
 	useEffect(() => {
@@ -46,13 +49,14 @@ const LoginPage = () => {
 
 			// Check content type before parsing JSON
 			const contentType = response.headers.get("content-type");
-			if (contentType && contentType.indexOf("application/json") !== -1) {
+			if (contentType?.indexOf("application/json") !== -1) {
 				const data = await response.json();
 				// On successful login, save the token and handle redirection
 				console.log("Login successful:", data);
 				localStorage.setItem("authToken", data.token);
-				// Here you would typically redirect the user or update the app's auth state
-				// e.g., window.location.href = '/dashboard';
+
+				// navigate to the home page on successful login
+				navigate("/");
 			} else {
 				// Handle non-JSON responses if necessary, or assume success without data
 				console.log("Login successful, but no JSON response.");
@@ -139,12 +143,12 @@ const LoginPage = () => {
 
 				<p className="text-center text-sm text-gray-600">
 					Don't have an account?{" "}
-					<a
-						href="#"
+					<Link
+						to="/register"
 						className="font-medium text-purple-600 hover:text-purple-500"
 					>
 						Register
-					</a>
+					</Link>
 				</p>
 			</div>
 		</div>

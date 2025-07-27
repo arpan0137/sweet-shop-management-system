@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Import Link and useNavigate
 import "aos/dist/aos.css";
 import AOS from "aos";
 
@@ -12,6 +13,8 @@ const RegistrationPage = () => {
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+
+	const navigate = useNavigate();
 
 	// Initialize AOS animations
 	useEffect(() => {
@@ -51,11 +54,14 @@ const RegistrationPage = () => {
 				);
 			}
 
-			setSuccess("Registration successful! Please log in.");
+			setSuccess("Registration successful! Redirecting to login...");
 			// Clear form fields on success
 			setUsername("");
 			setPassword("");
 			setConfirmPassword("");
+			setTimeout(() => {
+				navigate("/login");
+			}, 2000);
 		} catch (err) {
 			setError(err.message);
 		} finally {
@@ -158,18 +164,18 @@ const RegistrationPage = () => {
 						disabled={isLoading}
 						className="w-full flex justify-center py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition transform hover:scale-105 disabled:bg-purple-400 disabled:cursor-not-allowed"
 					>
-						{isLoading ? "Registering..." : "Sign Up"}
+						{isLoading ? "Registering..." : "Register"}
 					</button>
 				</form>
 
 				<p className="text-center text-sm text-gray-600">
 					Already have an account?{" "}
-					<a
-						href="#"
+					<Link
+						to="/login"
 						className="font-medium text-purple-600 hover:text-purple-500"
 					>
 						Log In
-					</a>
+					</Link>
 				</p>
 			</div>
 		</div>
