@@ -29,47 +29,78 @@ describe("POST /api/auth/register", () => {
     it("it should register a new user", async () => {
         // Should register a new user with valid data
         const response = await supertest(app)
-        .post("/api/auth/register")
-        .send({
-            username: "testuser",
-            password: "test123",
-        });
+            .post("/api/auth/register")
+            .send({
+                username: "testuser",
+                password: "test123",
+            });
         expect(response.statusCode).toEqual(201);
     });
 
-    it('should save the user to the database',async () => {
+    it('should save the user to the database', async () => {
         const userData = {
             username: "testuser2",
             password: "test1234"
         }
 
         await supertest(app)
-        .post('/api/auth/register')
-        .send(userData)
+            .post('/api/auth/register')
+            .send(userData)
 
-        const savedUser = await User.findOne({username: "testuser2"});
+        const savedUser = await User.findOne({ username: "testuser2" });
         expect(savedUser).not.toBeNull();
         expect(savedUser.username).toBe("testuser2");
     })
 });
 
-describe("POST /api/auth/login",() => {
+describe("POST /api/auth/login", () => {
     it("should login a valid user and return JWT token", async () => {
         // create a user and save to the database
         const password = 'password123';
         const hashedPassword = await bcryptjs.hash(password, 10);
-        await new User({username: 'loginuser', password: hashedPassword}).save();
+        await new User({ username: 'loginuser', password: hashedPassword }).save();
 
         // Attempt to login with correct credentials
         const response = await supertest(app)
-        .post('/api/auth/login')
-        .send({
-            username: 'loginuser',
-            password: password
-        });
+            .post('/api/auth/login')
+            .send({
+                username: 'loginuser',
+                password: password
+            });
 
         // Assert the response
         expect(response.statusCode).toBe(200);
         expect(response.body).toHaveProperty('token');
     });
+
+    it("should fail with an invalid username and return 401", async () => {
+        const res = await supertest(app)
+            .post('/api/auth/login')
+            .send({
+                username: "invalid user",
+                password: "password123"
+            })
+
+        expect(res.statusCode).toEqual(401);
+        expect(res.body).toHaveProperty('error', 'User not found')
+    })
+
+    it("should fail with an incorrect password and return 401", async () => {
+        // create a user
+        const password = "password123";
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        await new User({ username: "testuser_wrongpass", password: hashedPassword }).save();
+
+        //Attempt to login with the wrong password
+        const response = await supertest(app)
+            .post('/api/auth/login')
+            .send({
+                username: "testuser_wrongpass",
+                password: "wrongpassword"
+            })
+
+        //Assert the response
+        expect(response.statusCode).toBe(401)
+        expect(response.body).toHaveProperty('error', 'Invalid Credentials')
+    })
 })
