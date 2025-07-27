@@ -58,7 +58,7 @@ describe("POST /api/auth/login",() => {
         // create a user and save to the database
         const password = 'password123';
         const hashedPassword = await bcryptjs.hash(password, 10);
-        await new User({username: 'loginuser', password: 'hashedPassword'}).save();
+        await new User({username: 'loginuser', password: hashedPassword}).save();
 
         // Attempt to login with correct credentials
         const response = await supertest(app)
