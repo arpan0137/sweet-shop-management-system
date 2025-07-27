@@ -4,6 +4,27 @@ import app from '../app.js';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { env } from '../env.js';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+
+let mongoServer;
+
+// Set up the in-memory database before all tests
+beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+    await mongoose.connect(mongoUri);
+});
+
+// Clean up the database after each test
+afterEach(async () => {
+    await mongoose.connection.db.dropDatabase();
+});
+
+// Disconnect and stop the server after all tests
+afterAll(async () => {
+    await mongoose.disconnect();
+    await mongoServer.stop();
+});
 
 describe('POST /api/sweets', () => {
     it('should add a new sweet and return 201', async () => {

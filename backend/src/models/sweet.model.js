@@ -1,4 +1,3 @@
-import { env } from "../../env";
 import mongoose from "mongoose";
 
 const sweetSchema = new mongoose.Schema({
