@@ -3,6 +3,7 @@ import app from "../app";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { User } from "../src/models/user.model";
+import bcryptjs from "bcryptjs";
 
 let mongoServer;
 
@@ -51,3 +52,24 @@ describe("POST /api/auth/register", () => {
         expect(savedUser.username).toBe("testuser2");
     })
 });
+
+describe("POST /api/auth/login",() => {
+    it("should login a valid user and return JWT token", async () => {
+        // create a user and save to the database
+        const password = 'password123';
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        await new User({username: 'loginuser', password: 'hashedPassword'}).save();
+
+        // Attempt to login with correct credentials
+        const response = await supertest(app)
+        .post('/api/auth/login')
+        .send({
+            username: 'loginuser',
+            password: password
+        });
+
+        // Assert the response
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('token');
+    });
+})
