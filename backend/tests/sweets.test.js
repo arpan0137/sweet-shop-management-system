@@ -197,3 +197,45 @@ describe('POST /api/sweets/:id/purchase', () => {
         expect(res.statusCode).toEqual(401);
     });
 });
+
+describe('POST /api/sweets/:id/restock', () => {
+    let adminToken;
+    let sweetToRestock;
+
+    beforeEach(async () => {
+        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, process.env.JWT_SECRET);
+        sweetToRestock = await Sweet.create(
+            { name: 'Mohanthal', category: 'Burfi', price: 400, quantityinstock: 5 }
+        );
+    });
+
+    it('should allow an admin to restock a sweet and increase quantity', async () => {
+        const res = await request(app)
+            .post(`/api/sweets/${sweetToRestock._id}/restock`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ quantity: 20 }); // Send the quantity to add
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data.quantityinstock).toBe(25);
+    });
+
+    it('should block a non-admin from restocking a sweet', async () => {
+        const userToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, process.env.JWT_SECRET);
+        const res = await request(app)
+            .post(`/api/sweets/${sweetToRestock._id}/restock`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .send({ quantity: 10 });
+
+        expect(res.statusCode).toEqual(403);
+    });
+
+    it('should return an error if restock quantity is not provided or invalid', async () => {
+        const res = await request(app)
+            .post(`/api/sweets/${sweetToRestock._id}/restock`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ quantity: -5 }); // Invalid quantity
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.error).toBe('Invalid restock quantity');
+    });
+});
