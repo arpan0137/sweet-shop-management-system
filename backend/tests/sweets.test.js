@@ -78,7 +78,7 @@ describe('GET /api/sweets/search', () => {
     });
 
     it('should find sweets by name', async () => {
-        const res = await request(app)
+        const res = await supertest(app)
             .get('/api/sweets/search?name=Kaju+Katli')
             .set('Authorization', `Bearer ${token}`);
 
@@ -88,7 +88,7 @@ describe('GET /api/sweets/search', () => {
     });
 
     it('should find sweets by category', async () => {
-        const res = await request(app)
+        const res = await supertest(app)
             .get('/api/sweets/search?category=Syrupy')
             .set('Authorization', `Bearer ${token}`);
 
@@ -97,11 +97,33 @@ describe('GET /api/sweets/search', () => {
     });
 
     it('should find sweets by price range', async () => {
-        const res = await request(app)
+        const res = await supertest(app)
             .get('/api/sweets/search?minPrice=100&maxPrice=200')
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toEqual(200);
         expect(res.body.data.length).toBe(2);
+    });
+});
+
+describe('PUT /api/sweets/:id', () => {
+    let adminToken;
+    let sweetToUpdate;
+
+    beforeEach(async () => {
+        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, process.env.JWT_SECRET);
+        sweetToUpdate = await Sweet.create(
+            { name: 'Peda', category: 'Milk-based', price: 300, quantityinstock: 40 }
+        );
+    });
+
+    it('should allow an admin to update a sweet', async () => {
+        const res = await supertest(app)
+            .put(`/api/sweets/${sweetToUpdate._id}`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ price: 350, quantityinstock: 35 });
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data.price).toBe(350);
+        expect(res.body.data.quantityinstock).toBe(35);
     });
 });
