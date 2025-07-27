@@ -4,6 +4,9 @@ import { protect, admin } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+// only logged in users can view sweets
+router.get('/', protect, sweetsController.getAllSweets)
+
 // Route to add a new sweet.
 // It is protected by two middleware functions:
 // 1. `protect`: Ensures the user is logged in.

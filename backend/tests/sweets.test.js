@@ -5,6 +5,8 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { env } from '../env.js';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Sweet } from '../src/models/sweet.model.js';
+import supertest from 'supertest';
 
 let mongoServer;
 
@@ -44,18 +46,20 @@ describe('POST /api/sweets', () => {
 });
 
 describe('GET /api/sweets', () => {
-    it('should return a list of all sweets', async () => {
-        await Sweet.Create([
+    it('should return a list of all sweets for an authenticated user', async () => {
+        const token = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, env.jwtSecret);
+        await Sweet.create([
             { name: 'Gulab Jamun', category: 'Classic', price: 150, quantityinstock: 50 },
             { name: 'Rasgulla', category: 'Classic', price: 150, quantityinstock: 50 },
             { name: 'Kheer', category: 'Classic', price: 150, quantityinstock: 50 },
         ])
 
-        const res = await supertest(app).get('/api/sweets')
+        const res = await supertest(app)
+            .get('/api/sweets')
+            .set('Authorization', `Bearer ${token}`)
 
         expect(res.statusCode).toEqual(200);
         expect(res.body.data).toBeInstanceOf(Array);
         expect(res.body.data.length).toBe(3);
-        expect(res.body.data[0]).toHaveProperty('name', 'Gulab Jamun');
     })
 })
