@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 import {
 	BrowserRouter as Router,
@@ -9,6 +10,7 @@ import {
 import AOS from "aos";
 import LoginPage from "./pages/LoginPage";
 import RegistrationPage from "./pages/RegistrationPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
 	useEffect(() => {
@@ -22,7 +24,14 @@ function App() {
 		<Router>
 			<Routes>
 				{/* The default route redirects to the login page */}
-				<Route path="/" element={<Navigate to="/login" />} />
+				<Route
+					path="/"
+					element={
+						<ProtectedRoute>
+							<HomePage />
+						</ProtectedRoute>
+					}
+				/>
 
 				{/* Route for the login page */}
 				<Route path="/login" element={<LoginPage />} />
