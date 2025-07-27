@@ -23,3 +23,11 @@ export const protect = (req, res, next) => {
         res.status(401).json({ error: "Not Authorized, no token" });
     }
 }
+
+export const admin = (req, res, next) => {
+    if (req.user?.role === 'admin') {
+        next()
+    } else {
+        res.status(403).json({ error: "Not authorized as admin" })
+    }
+}
