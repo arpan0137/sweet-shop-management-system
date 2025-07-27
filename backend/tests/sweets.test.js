@@ -27,7 +27,7 @@ afterAll(async () => {
 });
 
 describe('POST /api/sweets', () => {
-    it('should add a new sweet and return 201', async () => {
+    it('should allow an admin to add a new sweet and return 201', async () => {
         const token = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, env.jwtSecret);
         const res = await request(app)
             .post('/api/sweets')
@@ -42,3 +42,20 @@ describe('POST /api/sweets', () => {
         expect(res.body.data).toHaveProperty('name', 'Gulab Jamun');
     });
 });
+
+describe('GET /api/sweets', () => {
+    it('should return a list of all sweets', async () => {
+        await Sweet.Create([
+            { name: 'Gulab Jamun', category: 'Classic', price: 150, quantityinstock: 50 },
+            { name: 'Rasgulla', category: 'Classic', price: 150, quantityinstock: 50 },
+            { name: 'Kheer', category: 'Classic', price: 150, quantityinstock: 50 },
+        ])
+
+        const res = await supertest(app).get('/api/sweets')
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data).toBeInstanceOf(Array);
+        expect(res.body.data.length).toBe(3);
+        expect(res.body.data[0]).toHaveProperty('name', 'Gulab Jamun');
+    })
+})

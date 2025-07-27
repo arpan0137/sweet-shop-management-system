@@ -24,6 +24,10 @@ export const protect = (req, res, next) => {
     }
 }
 
+
+// Middleware to authorize admin users.
+// This should be used AFTER the `protect` middleware.
+// It checks if the authenticated user has the 'admin' role.
 export const admin = (req, res, next) => {
     if (req.user?.role === 'admin') {
         next()

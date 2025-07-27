@@ -10,7 +10,7 @@ app.use(express.json());
 
 // Middleware for auth routes
 app.use("/api/auth", authRoutes);
-app.use("/api/sweets", protect, admin, sweetsRoutes)
+app.use("/api/sweets", sweetsRoutes)
 
 app.get('/api/protected-test', protect, (req, res) => {
     res.status(200).json({ message: "You have access" });
