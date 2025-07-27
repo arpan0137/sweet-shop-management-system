@@ -6,6 +6,7 @@ const router = express.Router();
 
 // only logged in users can view sweets
 router.get('/', protect, sweetsController.getAllSweets)
+router .get('/search', protect, sweetsController.searchSweets)
 
 // Route to add a new sweet.
 // It is protected by two middleware functions:
