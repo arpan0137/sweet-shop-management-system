@@ -1,5 +1,28 @@
 import supertest from "supertest";
 import app from "../app";
+import mongoose from "mongoose";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { User } from "../src/models/user.model";
+
+let mongoServer;
+
+//before all tests, create an in-memory MongoDB server and connect mongoose
+beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const MongoUri = mongoServer.getUri();
+    await mongoose.connect(MongoUri);
+})
+
+//after each test clear all data from the database
+afterEach(async () => {
+    await mongoose.connection.db.dropDatabase();
+})
+
+//after all tests, close the in-memory MongoDB server
+afterAll(async () => {
+    await mongoose.disconnect();
+    await mongoServer.stop();
+})
 
 describe("POST /api/auth/register", () => {
     it("it should register a new user", async () => {
@@ -7,7 +30,7 @@ describe("POST /api/auth/register", () => {
         const response = await supertest(app)
         .post("/api/auth/register")
         .send({
-            email: "testuser",
+            username: "testuser",
             password: "test123",
         });
         expect(response.statusCode).toEqual(201);
@@ -25,5 +48,6 @@ describe("POST /api/auth/register", () => {
 
         const savedUser = await User.findOne({username: "testuser2"});
         expect(savedUser).not.toBeNull();
+        expect(savedUser.username).toBe("testuser2");
     })
 });

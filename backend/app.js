@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
     res.send('Backend server is running!');
 });
 
-// Use auth routes for any requests to /api/auth
+// Middleware for auth routes
 app.use("/api/auth",authRoutes);
 
 export default app

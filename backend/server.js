@@ -1,8 +1,14 @@
-// In backend/server.js
 import app from "./app.js";
+import mongoose from "mongoose";
+import { env } from "./env.js";
 
-const PORT = process.env.PORT || 3001;
+const PORT = env.port || 3001;
+const DATABASE_URI = env.mongodbURI
 
-app.listen(PORT, () => {
-    console.log(`Server is listening on port http://localhost:${PORT}`);
+mongoose.connect(DATABASE_URI).then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is listening on port http://localhost:${PORT}`);
+    });
+}).catch(err => {
+    console.error('Database connection error:', err);
 });
