@@ -6,6 +6,8 @@ const DashboardPage = () => {
 	const [sweets, setSweets] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
+	const [successMessage, setSuccessMessage] = useState("");
+
 	const navigate = useNavigate();
 
 	// state for search and filter
@@ -77,6 +79,35 @@ const DashboardPage = () => {
 		fetchSweets();
 	}, [fetchSweets]);
 
+	const handlePurchase = async (sweetId) => {
+		const token = localStorage.getItem("authToken");
+		setSuccessMessage("");
+		setError("");
+
+		try {
+			const response = await fetch(`/api/sweets/${sweetId}/purchase`, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => null);
+				throw new Error(errorData?.error || "Purchase failed.");
+			}
+
+			const updatedSweet = await response.json();
+			setSuccessMessage(
+				`Successfully purchased ${updatedSweet.data.name}!`
+			);
+
+			await fetchSweets();
+		} catch (error) {
+			setError(error.message);
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-100 font-sans">
 			{/* Header */}
@@ -142,21 +173,31 @@ const DashboardPage = () => {
 					</div>
 				</div>
 
+				{successMessage && (
+					<p className="text-center text-green-600 bg-green-100 p-4 rounded-lg mb-4">
+						{successMessage}
+					</p>
+				)}
+
+				{error && (
+					<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg mb-4">
+						{error}
+					</p>
+				)}
 				{isLoading && (
 					<p className="text-center text-gray-500">
 						Loading sweets...
-					</p>
-				)}
-				{error && (
-					<p className="text-center text-red-500 bg-red-100 p-4 rounded-lg">
-						{error}
 					</p>
 				)}
 
 				{!isLoading && !error && sweets.length > 0 && (
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 						{sweets.map((sweet) => (
-							<SweetCard key={sweet._id} sweet={sweet} />
+							<SweetCard
+								key={sweet._id}
+								sweet={sweet}
+								onPurchase={handlePurchase}
+							/>
 						))}
 					</div>
 				)}

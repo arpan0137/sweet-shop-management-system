@@ -1,7 +1,14 @@
 import React from "react";
 
-const SweetCard = ({ sweet }) => {
+const SweetCard = ({ sweet, onPurchase }) => {
+	const [isPurchasing, setIsPurchasing] = React.useState(false);
 	const isOutOfStock = sweet.quantityinstock === 0;
+
+	const handlePurchaseClick = async () => {
+		setIsPurchasing(true);
+		await onPurchase(sweet._id);
+		setIsPurchasing(false);
+	};
 
 	return (
 		<div
@@ -30,10 +37,11 @@ const SweetCard = ({ sweet }) => {
 				</div>
 
 				<button
-					disabled={isOutOfStock}
+					onClick={handlePurchaseClick}
+					disabled={isOutOfStock || isPurchasing}
 					className="w-full py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-75 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
 				>
-					Purchase
+					{isPurchasing ? "Purchasing..." : "Purchase"}
 				</button>
 			</div>
 		</div>
