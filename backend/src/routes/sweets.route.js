@@ -16,6 +16,9 @@ router.put('/:id', protect, admin, sweetsController.updateSweet);
 //Route to delete sweets
 router.delete('/:id', protect, admin, sweetsController.deleteSweet);
 
+// Route to purchase a sweet
+router.post('/:id/purchase', protect, sweetsController.purchaseSweet);
+
 // Route to add a new sweet.
 // It is protected by two middleware functions:
 // 1. `protect`: Ensures the user is logged in.

@@ -162,7 +162,7 @@ describe('POST /api/sweets/:id/purchase', () => {
     let sweetToPurchase;
 
     beforeEach(async () => {
-        userToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, process.env.JWT_SECRET);
+        userToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, env.jwtSecret);
         sweetToPurchase = await Sweet.create(
             { name: 'Laddu', category: 'Classic', price: 180, quantityinstock: 10 }
         );
