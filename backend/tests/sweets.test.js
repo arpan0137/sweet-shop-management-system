@@ -63,3 +63,45 @@ describe('GET /api/sweets', () => {
         expect(res.body.data.length).toBe(3);
     })
 })
+
+describe('GET /api/sweets/search', () => {
+    let token;
+
+    // Before each test in this block, create a token and some sample sweets
+    beforeEach(async () => {
+        token = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'user' }, env.jwtSecret);
+        await Sweet.create([
+            { name: 'Kaju Katli', category: 'Barfi', price: 500, quantityinstock: 30 },
+            { name: 'Gulab Jamun', category: 'Syrupy', price: 150, quantityinstock: 50 },
+            { name: 'Jalebi', category: 'Syrupy', price: 120, quantityinstock: 80 }
+        ]);
+    });
+
+    it('should find sweets by name', async () => {
+        const res = await request(app)
+            .get('/api/sweets/search?name=Kaju+Katli')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0].name).toBe('Kaju Katli');
+    });
+
+    it('should find sweets by category', async () => {
+        const res = await request(app)
+            .get('/api/sweets/search?category=Syrupy')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data.length).toBe(2);
+    });
+
+    it('should find sweets by price range', async () => {
+        const res = await request(app)
+            .get('/api/sweets/search?minPrice=100&maxPrice=200')
+            .set('Authorization', `Bearer ${token}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.data.length).toBe(2);
+    });
+});
