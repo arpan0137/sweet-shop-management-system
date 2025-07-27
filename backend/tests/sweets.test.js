@@ -127,3 +127,28 @@ describe('PUT /api/sweets/:id', () => {
         expect(res.body.data.quantityinstock).toBe(35);
     });
 });
+
+describe('DELETE /api/sweets/:id', () => {
+    let adminToken;
+    let sweetToDelete;
+
+    beforeEach(async () => {
+        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, process.env.JWT_SECRET);
+        sweetToDelete = await Sweet.create(
+            { name: 'Barfi', category: 'Milk-based', price: 250, quantityinstock: 60 }
+        );
+    });
+
+    it('should allow an admin to delete a sweet', async () => {
+        const res = await request(app)
+            .delete(`/api/sweets/${sweetToDelete._id}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.message).toBe('Sweet deleted successfully');
+
+        // Verify the sweet is actually gone from the database
+        const foundSweet = await Sweet.findById(sweetToDelete._id);
+        expect(foundSweet).toBeNull();
+    });
+});
