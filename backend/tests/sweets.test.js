@@ -111,7 +111,7 @@ describe('PUT /api/sweets/:id', () => {
     let sweetToUpdate;
 
     beforeEach(async () => {
-        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, process.env.JWT_SECRET);
+        adminToken = jwt.sign({ userId: new mongoose.Types.ObjectId(), role: 'admin' }, env.jwtSecret);
         sweetToUpdate = await Sweet.create(
             { name: 'Peda', category: 'Milk-based', price: 300, quantityinstock: 40 }
         );
