@@ -1,7 +1,7 @@
 // In backend/app.js
 import express from "express";
+import authRoutes from "./src/routes/auth.routes.js";
 const app = express();
-import authRoutes from "./src/routes/auth.routes";
 
 // Middleware to parse JSON bodies
 app.use(express.json());
